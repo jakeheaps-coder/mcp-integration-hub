@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Domo — Design-to-Production Automation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --domo-blue: #99CCEE;
+  --accent-orange: #FF9922;
+  --neutral-50: #F1F6FA;
+  --neutral-100: #DCE4EA;
+  --neutral-200: #B7C1CB;
+  --neutral-600: #68737F;
+  --neutral-900: #3F454D;
+  --hero-bg: #0C0F1A;
+  --font-primary: 'Open Sans', -apple-system, sans-serif;
+  --shadow-sm: 0 1px 3px rgba(63,69,77,0.08), 0 1px 2px rgba(63,69,77,0.06);
+  --shadow-md: 0 4px 12px rgba(63,69,77,0.1), 0 2px 4px rgba(63,69,77,0.06);
+  --shadow-lg: 0 8px 20px rgba(63,69,77,0.08), 0 4px 8px rgba(63,69,77,0.04);
+  --shadow-blue-glow: 0 4px 20px rgba(153,204,238,0.3);
+  --shadow-orange-glow: 0 4px 20px rgba(255,153,34,0.3);
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --ease-smooth: cubic-bezier(0.83, 0, 0.17, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: var(--font-primary); color: var(--neutral-900); background: #fff; -webkit-font-smoothing: antialiased; line-height: 1.6; }
+h1, h2 { font-weight: 700; letter-spacing: -0.01em; line-height: 1.2; }
+h3, h4 { font-weight: 300; line-height: 1.3; }
+h1 { font-size: clamp(2rem, 5vw, 3.5rem); }
+h2 { font-size: clamp(1.5rem, 3.5vw, 2.5rem); }
+h3 { font-size: clamp(1.25rem, 2.5vw, 1.75rem); }
+a { color: var(--domo-blue); text-decoration: none; transition: color 0.3s var(--ease-smooth); }
+a:hover { color: var(--accent-orange); }
+.container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+.section { padding: 5rem 0; }
+.section-alt { background: var(--neutral-50); }
+.badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: var(--radius-sm); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+.badge-green { background: rgba(173,212,193,0.2); color: #3a7d5c; }
+.badge-blue { background: rgba(153,204,238,0.15); color: #4a8ab5; }
+.badge-orange { background: rgba(255,153,34,0.15); color: #c77a1a; }
+.btn { display: inline-block; padding: 0.75rem 1.75rem; border: none; border-radius: var(--radius-md); font-family: var(--font-primary); font-weight: 600; font-size: 0.9375rem; cursor: pointer; transition: all 0.3s var(--ease-smooth); text-decoration: none; }
+.btn-primary { background: var(--accent-orange); color: #fff; }
+.btn-primary:hover { background: #E8891F; color: #fff; transform: translateY(-1px); box-shadow: var(--shadow-orange-glow); }
+.btn-secondary { background: transparent; color: var(--neutral-900); border: 1.5px solid var(--neutral-200); }
+.btn-secondary:hover { border-color: var(--domo-blue); color: var(--domo-blue); }
+
+/* NAV */
+.nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(255,255,255,0.95); backdrop-filter: blur(12px); border-bottom: 1px solid var(--neutral-100); transition: all 0.3s var(--ease-smooth); }
+.nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 1rem 2rem; max-width: 1200px; margin: 0 auto; }
+.nav-logo { display: flex; align-items: center; gap: 0.75rem; }
+.nav-logo svg { width: 36px; height: 36px; }
+.nav-logo span { color: var(--neutral-900); font-weight: 700; font-size: 1.1rem; }
+.nav-links { display: flex; gap: 2rem; list-style: none; }
+.nav-links a { color: var(--neutral-600); font-size: 0.875rem; font-weight: 400; transition: color 0.3s; }
+.nav-links a:hover { color: var(--neutral-900); }
+@media (max-width: 768px) { .nav-links { display: none; } }
+
+/* HERO */
+.hero { background: linear-gradient(180deg, #99CCEE 0%, #7BB8E0 100%); padding: 8rem 0 5rem; position: relative; overflow: hidden; }
+.hero::before { content: ''; position: absolute; top: -50%; right: -20%; width: 80%; height: 200%; background: radial-gradient(ellipse at center, rgba(255,255,255,0.12) 0%, transparent 70%); pointer-events: none; }
+.hero-content { position: relative; z-index: 1; text-align: center; }
+.hero h1 { color: #fff; margin-bottom: 1rem; }
+.hero h1 span { color: var(--neutral-900); }
+.hero-sub { color: rgba(255,255,255,0.85); font-weight: 300; font-size: clamp(1rem, 2vw, 1.25rem); max-width: 700px; margin: 0 auto 3rem; }
+.hero-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; max-width: 700px; margin: 0 auto; }
+.stat { text-align: center; }
+.stat-num { font-size: 2.5rem; font-weight: 300; color: #fff; }
+.stat-label { font-size: 0.8rem; color: rgba(255,255,255,0.7); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 0.25rem; }
+@media (max-width: 768px) { .hero-stats { grid-template-columns: 1fr; gap: 1.5rem; } .hero { padding: 7rem 0 3rem; } }
+
+/* CARDS */
+.card { background: #fff; border: 1px solid var(--neutral-100); border-radius: var(--radius-lg); padding: 2rem; box-shadow: var(--shadow-sm); transition: all 0.3s var(--ease-smooth); }
+.card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: rgba(153,204,238,0.3); }
+.card-icon { width: 48px; height: 48px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; margin-bottom: 1rem; font-size: 1.5rem; }
+.card-icon-figma { background: rgba(153,204,238,0.12); color: var(--domo-blue); }
+.card-icon-webflow { background: rgba(255,153,34,0.12); color: var(--accent-orange); }
+.card-icon-connect { background: rgba(173,212,193,0.15); color: #3a7d5c; }
+.card h3 { font-weight: 700; font-size: 1.25rem; margin-bottom: 0.5rem; }
+.card p { color: var(--neutral-600); font-size: 0.9375rem; }
+.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; }
+.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; }
+@media (max-width: 992px) { .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 768px) { .grid-3, .grid-2, .grid-4 { grid-template-columns: 1fr; } }
+
+/* SECTION HEADERS */
+.section-header { margin-bottom: 3rem; }
+.section-header .overline { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--domo-blue); margin-bottom: 0.5rem; }
+.section-header p { color: var(--neutral-600); max-width: 650px; margin-top: 0.75rem; font-size: 1.0625rem; }
+
+/* ARCHITECTURE DIAGRAM */
+.arch { padding: 4rem 0; }
+.arch-flow { display: flex; align-items: center; justify-content: center; gap: 0; flex-wrap: wrap; padding: 2rem 0; }
+.arch-node { background: #fff; border: 2px solid var(--neutral-100); border-radius: var(--radius-lg); padding: 1.25rem 1.75rem; text-align: center; min-width: 160px; transition: all 0.3s var(--ease-smooth); position: relative; }
+.arch-node:hover { border-color: var(--domo-blue); box-shadow: var(--shadow-blue-glow); }
+.arch-node-center { background: var(--hero-bg); border-color: var(--domo-blue); color: #fff; min-width: 200px; }
+.arch-node-center .arch-node-label { color: #fff; }
+.arch-node-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+.arch-node-label { font-weight: 600; font-size: 0.875rem; color: var(--neutral-900); }
+.arch-node-sub { font-size: 0.75rem; color: var(--neutral-600); margin-top: 0.25rem; }
+.arch-node-center .arch-node-sub { color: var(--neutral-200); }
+.arch-arrow { display: flex; align-items: center; padding: 0 0.5rem; color: var(--neutral-200); font-size: 1.5rem; }
+.arch-bridge { text-align: center; margin-top: 1.5rem; padding: 1rem 2rem; background: rgba(173,212,193,0.1); border: 1px dashed #ADD4C1; border-radius: var(--radius-lg); display: inline-block; }
+.arch-bridge-label { font-weight: 600; color: #3a7d5c; font-size: 0.875rem; }
+.arch-bridge-sub { font-size: 0.75rem; color: var(--neutral-600); }
+@media (max-width: 768px) { .arch-flow { flex-direction: column; } .arch-arrow { transform: rotate(90deg); padding: 0.5rem 0; } }
+
+/* TOOL TABLES */
+.tool-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+.tool-table th { text-align: left; padding: 0.75rem 1rem; background: var(--neutral-50); border-bottom: 2px solid var(--neutral-100); font-weight: 600; color: var(--neutral-900); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
+.tool-table td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--neutral-100); vertical-align: top; }
+.tool-table tr:hover td { background: rgba(153,204,238,0.04); }
+.tool-table code { background: var(--neutral-50); padding: 0.15rem 0.4rem; border-radius: 4px; font-size: 0.8125rem; font-family: 'SF Mono', 'Fira Code', monospace; color: var(--neutral-900); }
+
+/* CODE BLOCKS */
+.code-block { background: var(--hero-bg); border-radius: var(--radius-lg); padding: 1.5rem; overflow-x: auto; position: relative; margin: 1rem 0; }
+.code-block code { color: #e2e8f0; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 0.8125rem; line-height: 1.7; white-space: pre; }
+.code-block .kw { color: var(--domo-blue); }
+.code-block .str { color: #ADD4C1; }
+.code-block .cmt { color: var(--neutral-600); }
+.code-copy { position: absolute; top: 0.75rem; right: 0.75rem; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); color: var(--neutral-200); border-radius: var(--radius-sm); padding: 0.35rem 0.65rem; font-size: 0.7rem; cursor: pointer; font-family: var(--font-primary); transition: all 0.2s; }
+.code-copy:hover { background: rgba(255,255,255,0.2); color: #fff; }
+
+/* TABS */
+.tabs { display: flex; gap: 0; border-bottom: 2px solid var(--neutral-100); margin-bottom: 2rem; }
+.tab { padding: 0.75rem 1.5rem; font-weight: 600; font-size: 0.875rem; color: var(--neutral-600); cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all 0.3s; }
+.tab:hover { color: var(--neutral-900); }
+.tab.active { color: var(--domo-blue); border-bottom-color: var(--domo-blue); }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+/* MAPPING TABLE */
+.mapping-table { width: 100%; border-collapse: collapse; }
+.mapping-table th { text-align: left; padding: 0.75rem 1rem; background: var(--domo-blue); color: #fff; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 600; }
+.mapping-table th:first-child { border-radius: var(--radius-md) 0 0 0; }
+.mapping-table th:last-child { border-radius: 0 var(--radius-md) 0 0; }
+.mapping-table td { padding: 0.75rem 1rem; border-bottom: 1px solid var(--neutral-100); font-size: 0.875rem; }
+.mapping-table tr:hover td { background: rgba(153,204,238,0.06); }
+.mapping-table .match-direct { color: #3a7d5c; font-weight: 600; }
+.mapping-table .match-structural { color: #c77a1a; font-weight: 600; }
+
+/* ACCORDION */
+.accordion-item { border: 1px solid var(--neutral-100); border-radius: var(--radius-lg); margin-bottom: 0.75rem; overflow: hidden; transition: border-color 0.3s; }
+.accordion-item:hover { border-color: rgba(153,204,238,0.4); }
+.accordion-header { padding: 1.25rem 1.5rem; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 600; font-size: 1rem; background: #fff; transition: background 0.3s; }
+.accordion-header:hover { background: var(--neutral-50); }
+.accordion-chevron { transition: transform 0.3s var(--ease-smooth); color: var(--neutral-600); }
+.accordion-item.open .accordion-chevron { transform: rotate(180deg); }
+.accordion-body { padding: 0 1.5rem; max-height: 0; overflow: hidden; transition: max-height 0.4s var(--ease-smooth), padding 0.4s; }
+.accordion-item.open .accordion-body { max-height: 600px; padding: 0 1.5rem 1.5rem; }
+
+/* IMPACT CARDS */
+.impact-card { text-align: center; padding: 2.5rem 1.5rem; }
+.impact-num { font-size: 2.5rem; font-weight: 800; color: var(--domo-blue); margin-bottom: 0.25rem; }
+.impact-label { font-weight: 700; font-size: 1rem; margin-bottom: 0.5rem; }
+.impact-desc { color: var(--neutral-600); font-size: 0.875rem; }
+
+/* GOVERNANCE */
+.gov-item { display: flex; gap: 1rem; align-items: flex-start; padding: 1rem 0; border-bottom: 1px solid var(--neutral-100); }
+.gov-item:last-child { border-bottom: none; }
+.gov-icon { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1rem; }
+.gov-icon-lock { background: rgba(153,204,238,0.12); color: var(--domo-blue); }
+.gov-icon-shield { background: rgba(173,212,193,0.15); color: #3a7d5c; }
+.gov-icon-eye { background: rgba(255,153,34,0.12); color: var(--accent-orange); }
+
+/* FOOTER */
+.footer { background: var(--hero-bg); padding: 3rem 0; color: var(--neutral-200); }
+.footer-inner { display: flex; justify-content: space-between; align-items: center; }
+.footer a { color: var(--neutral-200); }
+.footer a:hover { color: #fff; }
+.footer-links { display: flex; gap: 1.5rem; font-size: 0.875rem; }
+@media (max-width: 768px) { .footer-inner { flex-direction: column; gap: 1rem; text-align: center; } }
+
+/* ANIMATIONS */
+@keyframes domoFadeInUp { from { opacity: 0; transform: translateY(1.5rem); } to { opacity: 1; transform: translateY(0); } }
+.animate { opacity: 0; transform: translateY(1.5rem); transition: opacity 0.6s var(--ease-out-expo), transform 0.6s var(--ease-out-expo); }
+.animate.visible { opacity: 1; transform: translateY(0); }
+@media (prefers-reduced-motion: reduce) { .animate { opacity: 1; transform: none; transition: none; } }
+*:focus-visible { outline: 2px solid var(--domo-blue); outline-offset: 2px; }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+<div class="nav-inner">
+<div class="nav-logo">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="36" height="36"><path fill="#99CCEE" d="M150.5,328.6c12.4,13.8,21.2,30.9,25,49.8,9.9-48.8,53-85.5,104.7-85.5s94.8,36.8,104.7,85.6v-85.6l106.8,106.8,107.1-106.8v85.6c9.9-48.8,53-85.6,104.7-85.6s79.2,24.8,96.4,60.7V0H0v292.9h70.8c31.7,0,60.1,13.8,79.7,35.7Z"/><path fill="#99CCEE" d="M703.6,506.6c-51.7,0-94.8-36.8-104.7-85.6v85.6h-36v-127.8l-71.1,71.4-71.4-71.4v127.8h-35.4v-85.6c-9.9,48.8-53,85.6-104.7,85.6s-94.8-36.7-104.7-85.5c-3.8,18.9-12.6,36-25,49.8-19.6,21.9-48,35.7-79.7,35.7H0v293.4h800v-354.2c-17.2,35.9-53.9,60.7-96.4,60.7h0Z"/><path fill="#99CCEE" d="M280.2,471c39.4,0,71.3-31.9,71.3-71.3s-31.9-71.3-71.3-71.3-71.3,31.9-71.3,71.3,31.9,71.3,71.3,71.3Z"/><path fill="#99CCEE" d="M142.1,399.7c0-37.8-29.4-68.7-66.6-71.1h-40.1v142.2h40.1c37.2-2.4,66.6-33.3,66.6-71.1h0Z"/><path fill="#99CCEE" d="M703.6,471c39.4,0,71.3-31.9,71.3-71.3s-31.9-71.3-71.3-71.3-71.3,31.9-71.3,71.3,31.9,71.3,71.3,71.3Z"/><path fill="#FFF" d="M150.5,470.8c12.4-13.8,21.2-30.9,25-49.8,9.9,48.8,53,85.5,104.7,85.5s94.8-36.8,104.7-85.6v85.6h35.4v-127.8l71.4,71.4,71.1-71.4v127.8h36v-85.6c9.9,48.8,53,85.6,104.7,85.6s79.2-24.8,96.4-60.7v-92.2c-17.2-35.9-53.9-60.7-96.4-60.7s-94.8,36.8-104.7,85.6v-85.6l-107.1,106.8-106.8-106.8v85.6c-9.9-48.8-53-85.6-104.7-85.6s-94.8,36.7-104.7,85.5c-3.8-18.9-12.6-36-25-49.8-19.6-21.9-48-35.7-79.7-35.7H0v213.7h70.8c31.7,0,60.1-13.8,79.7-35.7h0ZM703.6,328.5c39.4,0,71.3,31.9,71.3,71.3s-31.9,71.3-71.3,71.3-71.3-31.9-71.3-71.3,31.9-71.3,71.3-71.3ZM280.2,328.5c39.4,0,71.3,31.9,71.3,71.3s-31.9,71.3-71.3,71.3-71.3-31.9-71.3-71.3,31.9-71.3,71.3-71.3ZM35.4,328.6h40.1c37.2,2.4,66.6,33.3,66.6,71.1s-29.4,68.7-66.6,71.1h-40.1v-142.2h0Z"/></svg>
+<span>MCP Integration Hub</span>
+</div>
+<ul class="nav-links">
+<li><a href="#overview">Overview</a></li>
+<li><a href="#architecture">Architecture</a></li>
+<li><a href="#figma">Figma</a></li>
+<li><a href="#webflow">Webflow</a></li>
+<li><a href="#code-connect">Code Connect</a></li>
+<li><a href="#governance">Governance</a></li>
+<li><a href="#impact">Impact</a></li>
+<li><a href="#use-cases">Use Cases</a></li>
+</ul>
+</div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="overview">
+<div class="container hero-content">
+<h1>Design to Production,<br><span>Automated.</span></h1>
+<p class="hero-sub">Bridge the gap between Figma designs and Webflow production using AI-powered MCP integration. Faster builds, zero drift, full governance.</p>
+<div class="hero-stats">
+<div class="stat"><div class="stat-num" data-value="170">0</div><div class="stat-label">Webflow Components</div></div>
+<div class="stat"><div class="stat-num" data-value="13">0</div><div class="stat-label">Components Mapped</div></div>
+<div class="stat"><div class="stat-num" data-value="1000">0</div><div class="stat-label">Connectors Available</div></div>
+</div>
+</div>
+</section>
+
+<!-- WHAT IS MCP -->
+<section class="section" id="what-is-mcp">
+<div class="container">
+<div class="section-header animate">
+<div class="overline">The Technology</div>
+<h2>What is MCP?</h2>
+<p>Model Context Protocol (MCP) is an open standard that connects AI assistants to external tools and platforms. It allows Claude Code to read from Figma, write to Webflow, and keep everything in sync automatically.</p>
+</div>
+<div class="grid-2 animate">
+<div class="card">
+<div class="card-icon card-icon-figma">F</div>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem"><h3 style="font-weight:700;font-size:1.1rem">Figma MCP</h3><span class="badge badge-green">Connected</span></div>
+<p>Reads design files, extracts components, pulls design tokens, and maps Figma components to production code. Authenticated via Figma's official OAuth with Enterprise Full seat access.</p>
+</div>
+<div class="card">
+<div class="card-icon card-icon-webflow">W</div>
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.5rem"><h3 style="font-weight:700;font-size:1.1rem">Webflow MCP</h3><span class="badge badge-green">Connected</span></div>
+<p>Manages the production website: pages, elements, styles, components, CMS collections, and scripts. Operates in read-only mode by default with explicit permission required for any writes.</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- ARCHITECTURE -->
+<section class="section section-alt" id="architecture">
+<div class="container">
+<div class="section-header animate">
+<div class="overline">How It Works</div>
+<h2>Architecture</h2>
+<p>The design-to-production pipeline flows through Claude Code as the intelligent orchestrator, reading from Figma and writing to Webflow with Code Connect ensuring component fidelity.</p>
+</div>
+<div class="arch-flow animate">
+<div class="arch-node">
+<div class="arch-node-icon">F</div>
+<div class="arch-node-label">Figma Design</div>
+<div class="arch-node-sub">Source of truth</div>
+</div>
+<div class="arch-arrow">&rarr;</div>
+<div class="arch-node">
+<div class="arch-node-icon" style="color:var(--domo-blue)">&#9671;</div>
+<div class="arch-node-label">Figma MCP</div>
+<div class="arch-node-sub">OAuth / Enterprise</div>
+</div>
+<div class="arch-arrow">&rarr;</div>
+<div class="arch-node arch-node-center">
+<div class="arch-node-icon">&#9881;</div>
+<div class="arch-node-label">Claude Code</div>
+<div class="arch-node-sub">AI Orchestrator</div>
+</div>
+<div class="arch-arrow">&rarr;</div>
+<div class="arch-node">
+<div class="arch-node-icon" style="color:var(--accent-orange)">&#9671;</div>
+<div class="arch-node-label">Webflow MCP</div>
+<div class="arch-node-sub">Token Auth / Read-Only Default</div>
+</div>
+<div class="arch-arrow">&rarr;</div>
+<div class="arch-node">
+<div class="arch-node-icon">W</div>
+<div class="arch-node-label">Webflow Production</div>
+<div class="arch-node-sub">domo-webflow.domo.com</div>
+</div>
+</div>
+<div style="text-align:center" class="animate">
+<div class="arch-bridge">
+<div class="arch-bridge-label">Code Connect</div>
+<div class="arch-bridge-sub">Maps Figma components to Webflow components 1:1</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- FIGMA MCP -->
+<section class="section" id="figma">
+<div class="container">
+<div class="section-header animate">
+<div class="overline">Design Source</div>
+<h2>Figma MCP</h2>
+<p>Pull designs, extract components, read design tokens, and map Figma components to your codebase, all through Figma's official MCP server.</p>
+</div>
+<div class="animate">
+<h3 style="font-weight:700;font-size:1.1rem;margin-bottom:1rem">Available Tools</h3>
+<div style="overflow-x:auto">
+<table class="tool-table">
+<thead><tr><th>Tool</th><th>What It Does</th><th>Access</th></tr></thead>
+<tbody>
+<tr><td><code>get_design_context</code></td><td>Pull code, screenshot, and design context from any Figma frame</td><td><span class="badge badge-blue">Read</span></td></tr>
+<tr><td><code>get_screenshot</code></td><td>Generate a screenshot of any node in the Figma file</td><td><span class="badge badge-blue">Read</span></td></tr>
+<tr><td><code>get_metadata</code></td><td>Get the XML structure of a frame (node IDs, positions, sizes)</td><td><span class="badge badge-blue">Read</span></td></tr>
+<tr><td><code>get_variable_defs</code></td><td>Get design tokens: colors, spacing, typography variables</td><td><span class="badge badge-blue">Read</span></td></tr>
+<tr><td><code>get_code_connect_map</code></td><td>See existing Code Connect mappings between Figma and code</td><td><span class="badge badge-blue">Read</span></td></tr>
+<tr><td><code>get_code_connect_suggestions</code></td><td>AI-powered suggestions for mapping Figma components to code</td><td><span class="badge badge-blue">Read</span></td></tr>
+<tr><td><code>add_code_connect_map</code></td><td>Create a new component mapping</td><td><span class="badge badge-orange">Write</span></td></tr>
+<tr><td><code>generate_figma_design</code></td><td>Capture live web pages into editable Figma frames</td><td><span class="badge badge-orange">Write</span></td></tr>
+<tr><td><code>generate_diagram</code></td><td>Create flowcharts and diagrams in FigJam</td><td><span class="badge badge-orange">Write</span></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="code-block animate" style="margin-top:2rem">
+<button class="code-copy" onclick="copyCode(this)">Copy</button>
+<code><span class="cmt"># Add Figma MCP to Claude Code</span>
+claude mcp add --transport http figma https://mcp.figma.com/mcp
+
+<span class="cmt"># Authenticates via browser OAuth (Enterprise Full seat required)</span></code>
+</div>
+</div>
+</section>
+
+<!-- WEBFLOW MCP -->
+<section class="section section-alt" id="webflow">
+<div class="container">
+<div class="section-header animate">
+<div class="overline">Production Target</div>
+<h2>Webflow MCP</h2>
+<p>Full access to the Domo Production Site including the Designer tools and Data API. Read-only by default, explicit permission required for any modifications.</p>
+</div>
+
+<div class="tabs animate">
+<div class="tab active" data-tab="designer">Designer Tools</div>
+<div class="tab" data-tab="dataapi">Data API</div>
+</div>
+
+<div class="tab-content active" id="tab-designer">
+<p style="color:var(--neutral-600);margin-bottom:1rem;font-size:0.9375rem">Requires Webflow Designer to be open in the browser. Provides direct access to the visual canvas.</p>
+<div style="overflow-x:auto">
+<table class="tool-table">
+<thead><tr><th>Tool</th><th>Capability</th><th>Access</th></tr></thead>
+<tbody>
+<tr><td><code>element_builder</code></td><td>Create new elements on pages (sections, divs, headings, images, buttons)</td><td><span class="badge badge-orange">Write</span></td></tr>
+<tr><td><code>element_tool</code></td><td>Get, select, and modify existing elements (text, links, attributes, styles)</td><td><span class="badge badge-blue">Read</span> <span class="badge badge-orange">Write</span></td></tr>
+<tr><td><code>style_tool</code></td><td>Create and manage CSS styles, update properties per breakpoint</td><td><span class="badge badge-blue">Read</span> <span class="badge badge-orange">Write</span></td></tr>
+<tr><td><code>de_component_tool</code></td><td>List, insert, rename, and transform elements into reusable components</td><td><span class="badge badge-blue">Read</span> <span class="badge badge-orange">Write</span></td></tr>
+<tr><td><code>de_page_tool</code></td><td>Create pages and folders, switch between pages</td><td><span class="badge badge-blue">Read</span> <span class="badge badge-orange">Write</span></td></tr>
+<tr><td><code>variable_tool</code></td><td>Manage design variables (colors, sizes, fonts) across collections and modes</td><td><span class="badge badge-blue">Read</span> <span class="badge badge-orange">Write</span></td></tr>
+<tr><td><code>element_snapshot_tool</code></td><td>Get visual snapshots of elements for debugging</td><td><span class="badge badge-blue">Read</span></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+
+<div class="tab-content" id="tab-dataapi">
+<p style="color:var(--neutral-600);margin-bottom:1rem;font-size:0.9375rem">Always available via API token. Manages content, pages, and site publishing.</p>
+<div style="overflow-x:auto">
+<table class="tool-table">
+<thead><tr><th>Tool</th><th>Capability</th><th>Access</th></tr></thead>
+<tbody>
+<tr><td><code>data_cms_tool</code></td><td>Manage CMS collections, create/update/delete items, manage fields</td><td><span class="badge badge-blue">Read</span> <span class="badge badge-orange">Write</span></td></tr>
+<tr><td><code>data_pages_tool</code></td><td>List pages, get/update metadata, SEO settings, localized content</td><td><span class="badge badge-blue">Read</span> <span class="badge badge-orange">Write</span></td></tr>
+<tr><td><code>data_sites_tool</code></td><td>List sites, get details, publish to domains</td><td><span class="badge badge-blue">Read</span> <span class="badge badge-orange">Write</span></td></tr>
+<tr><td><code>data_scripts_tool</code></td><td>Register and manage custom scripts on sites and pages</td><td><span class="badge badge-blue">Read</span> <span class="badge badge-orange">Write</span></td></tr>
+<tr><td><code>data_components_tool</code></td><td>Manage component content and properties for localization</td><td><span class="badge badge-blue">Read</span> <span class="badge badge-orange">Write</span></td></tr>
+<tr><td><code>asset_tool</code></td><td>Manage assets and folders, update alt text</td><td><span class="badge badge-blue">Read</span> <span class="badge badge-orange">Write</span></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+</section>
+
+<!-- CODE CONNECT -->
+<section class="section" id="code-connect">
+<div class="container">
+<div class="section-header animate">
+<div class="overline">The Bridge</div>
+<h2>Code Connect</h2>
+<p>Maps Figma design components directly to Webflow production components. When a design is pulled from Figma, the system references your real components rather than generating generic code from scratch.</p>
+</div>
+
+<div class="grid-2 animate" style="margin-bottom:3rem">
+<div class="card">
+<h3 style="font-weight:700;font-size:1.1rem;color:var(--neutral-900)">Without Code Connect</h3>
+<p style="margin-top:0.5rem">Figma frame generates generic HTML/CSS. Developer manually identifies matching Webflow components. Copy-paste, adjust, test. Repeated for every design change.</p>
+<div style="margin-top:1rem;padding:0.75rem;background:rgba(255,153,34,0.08);border-radius:var(--radius-md);font-size:0.8125rem;color:#c77a1a;font-weight:600">Hours of manual translation per page</div>
+</div>
+<div class="card" style="border-color:rgba(173,212,193,0.4)">
+<h3 style="font-weight:700;font-size:1.1rem;color:var(--neutral-900)">With Code Connect</h3>
+<p style="margin-top:0.5rem">Figma components automatically resolve to their Webflow counterparts. The system knows Button Primary = Button Link, FAQ = FAQ Section. Instant, accurate, consistent.</p>
+<div style="margin-top:1rem;padding:0.75rem;background:rgba(173,212,193,0.12);border-radius:var(--radius-md);font-size:0.8125rem;color:#3a7d5c;font-weight:600">Minutes from design to production</div>
+</div>
+</div>
+
+<h3 style="font-weight:700;font-size:1.1rem;margin-bottom:1.5rem" class="animate">Component Mapping Reference</h3>
+<div style="overflow-x:auto" class="animate">
+<table class="mapping-table">
+<thead><tr><th>Figma Component</th><th>Figma Node</th><th>Webflow Component</th><th>Match</th></tr></thead>
+<tbody>
+<tr><td>menu</td><td><code>1:184</code></td><td>Navigation</td><td class="match-direct">Direct</td></tr>
+<tr><td>Button (Primary)</td><td><code>1:243</code></td><td>Button Link</td><td class="match-direct">Direct</td></tr>
+<tr><td>Button (Secondary)</td><td><code>1:251</code></td><td>Button Link Light</td><td class="match-direct">Direct</td></tr>
+<tr><td>Button (Tertiary)</td><td><code>1:540</code></td><td>Button Link Small</td><td class="match-direct">Direct</td></tr>
+<tr><td>Text Section Title</td><td><code>1:701</code></td><td>Header Section / Pillar Hero</td><td class="match-direct">Direct</td></tr>
+<tr><td>Subnav</td><td><code>1:671</code></td><td>Anchor Links</td><td class="match-direct">Direct</td></tr>
+<tr><td>FAQ</td><td><code>15:2774</code></td><td>FAQ Section / CMS FAQ Section</td><td class="match-direct">Direct</td></tr>
+<tr><td>Accordion Item</td><td><code>15:2754</code></td><td>FAQ Item</td><td class="match-direct">Direct</td></tr>
+<tr><td>headline-link</td><td><code>135:1208</code></td><td>Pillar Link Block</td><td class="match-direct">Direct</td></tr>
+<tr><td>Image (3:2)</td><td><code>1:429</code></td><td>Panel List / Panel Tabs</td><td class="match-structural">Structural</td></tr>
+<tr><td>Hero Footer Jumbo</td><td><code>1:1095</code></td><td>Get Started Section</td><td class="match-direct">Direct</td></tr>
+<tr><td>Card Grid Icon</td><td>&mdash;</td><td>Card Grid Icon / Card Grid Icon 4</td><td class="match-direct">Direct</td></tr>
+<tr><td>Quote section</td><td>&mdash;</td><td>Quote Section / Quote Section w/ Button</td><td class="match-direct">Direct</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+
+<!-- GOVERNANCE -->
+<section class="section section-alt" id="governance">
+<div class="container">
+<div class="section-header animate">
+<div class="overline">Safety First</div>
+<h2>Governance &amp; Controls</h2>
+<p>Every interaction is governed by strict access controls. The system operates in read-only mode by default and requires explicit permission for any modifications to the production site.</p>
+</div>
+<div class="grid-2 animate">
+<div class="card">
+<h3 style="font-weight:700;font-size:1.1rem;margin-bottom:1.5rem">Access Controls</h3>
+<div class="gov-item">
+<div class="gov-icon gov-icon-lock">&#128274;</div>
+<div><strong>Read-Only Default</strong><p style="font-size:0.8125rem;color:var(--neutral-600);margin-top:0.25rem">Webflow MCP operates in read-only mode. Write operations require explicit user approval for each action.</p></div>
+</div>
+<div class="gov-item">
+<div class="gov-icon gov-icon-shield">&#128737;</div>
+<div><strong>Permission Hooks</strong><p style="font-size:0.8125rem;color:var(--neutral-600);margin-top:0.25rem">Pre-execution hooks validate every tool call before it runs. Credential leaks, SSR patterns, and production modifications are caught automatically.</p></div>
+</div>
+<div class="gov-item">
+<div class="gov-icon gov-icon-eye">&#128065;</div>
+<div><strong>Full Audit Trail</strong><p style="font-size:0.8125rem;color:var(--neutral-600);margin-top:0.25rem">Every MCP tool call is logged with timestamps, parameters, and results. Complete visibility into what was read, written, or modified.</p></div>
+</div>
+</div>
+<div class="card">
+<h3 style="font-weight:700;font-size:1.1rem;margin-bottom:1.5rem">Protection Layers</h3>
+<div class="gov-item">
+<div class="gov-icon gov-icon-shield">&#9989;</div>
+<div><strong>Credential Detection</strong><p style="font-size:0.8125rem;color:var(--neutral-600);margin-top:0.25rem">Automatically blocks commits containing API keys, tokens, or passwords. Prevents accidental exposure of sensitive data.</p></div>
+</div>
+<div class="gov-item">
+<div class="gov-icon gov-icon-lock">&#128274;</div>
+<div><strong>Production Safeguards</strong><p style="font-size:0.8125rem;color:var(--neutral-600);margin-top:0.25rem">Production code and knowledge graph data cannot be modified without explicit approval. Changes are validated before execution.</p></div>
+</div>
+<div class="gov-item">
+<div class="gov-icon gov-icon-eye">&#128736;</div>
+<div><strong>Pattern Validation</strong><p style="font-size:0.8125rem;color:var(--neutral-600);margin-top:0.25rem">SSR patterns, server-side code, and framework anti-patterns are detected and flagged before they reach production.</p></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- IMPACT -->
+<section class="section" id="impact">
+<div class="container">
+<div class="section-header animate" style="text-align:center">
+<div class="overline">The Opportunity</div>
+<h2>Impact &amp; Benefits</h2>
+</div>
+<div class="grid-4 animate">
+<div class="card impact-card">
+<div class="impact-num">10x</div>
+<div class="impact-label">Faster</div>
+<div class="impact-desc">Design to production in minutes instead of days. AI handles the translation layer automatically.</div>
+</div>
+<div class="card impact-card">
+<div class="impact-num" style="color:#3a7d5c">0</div>
+<div class="impact-label">Drift</div>
+<div class="impact-desc">Components stay perfectly in sync between Figma and Webflow. One design system, two platforms.</div>
+</div>
+<div class="card impact-card">
+<div class="impact-num">100%</div>
+<div class="impact-label">Governed</div>
+<div class="impact-desc">Every write operation requires explicit permission. Read-only by default. Full audit trail on every action.</div>
+</div>
+<div class="card impact-card">
+<div class="impact-num" style="color:var(--accent-orange)">170+</div>
+<div class="impact-label">Components</div>
+<div class="impact-desc">Full access to the entire Webflow component library. Every section, card, form, and layout pattern.</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- USE CASES -->
+<section class="section" id="use-cases">
+<div class="container">
+<div class="section-header animate" style="text-align:center">
+<div class="overline">What This Enables</div>
+<h2>Use Cases</h2>
+<p style="max-width:700px;margin:0.75rem auto 0">Real workflows that become possible when Figma and Webflow are connected through AI. Every use case below leverages existing MCP tools with full governance controls.</p>
+</div>
+
+<div class="grid-3 animate" style="margin-bottom:1.5rem">
+<div class="card">
+<div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:0.75rem"><div class="card-icon card-icon-webflow" style="margin-bottom:0">S</div><span class="badge badge-orange">SEO</span></div>
+<h3 style="font-weight:700;font-size:1rem;margin-bottom:0.5rem">Bulk SEO Metadata Updates</h3>
+<p style="font-size:0.8125rem;color:var(--neutral-600)">Update page titles, meta descriptions, and Open Graph tags across hundreds of pages in a single pass. No more manually editing each page in the Webflow Designer.</p>
+<div style="margin-top:0.75rem;font-size:0.75rem;color:var(--neutral-200)">data_pages_tool &rarr; update_page_settings</div>
+</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:0.75rem"><div class="card-icon card-icon-webflow" style="margin-bottom:0">R</div><span class="badge badge-orange">SEO</span></div>
+<h3 style="font-weight:700;font-size:1rem;margin-bottom:0.5rem">301 Redirect Management</h3>
+<p style="font-size:0.8125rem;color:var(--neutral-600)">Create, update, and audit 301 redirects at scale. Migrate URL structures, fix broken links, and manage redirect chains programmatically across the entire site.</p>
+<div style="margin-top:0.75rem;font-size:0.75rem;color:var(--neutral-200)">data_enterprise_tool &rarr; create/update_301_redirect</div>
+</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:0.75rem"><div class="card-icon card-icon-webflow" style="margin-bottom:0">R</div><span class="badge badge-orange">SEO</span></div>
+<h3 style="font-weight:700;font-size:1rem;margin-bottom:0.5rem">Robots.txt &amp; Crawl Control</h3>
+<p style="font-size:0.8125rem;color:var(--neutral-600)">Manage robots.txt rules and crawl directives programmatically. Add, update, or remove rules for specific user agents. Control sitemap references and crawl boundaries.</p>
+<div style="margin-top:0.75rem;font-size:0.75rem;color:var(--neutral-200)">data_enterprise_tool &rarr; update_robots_txt</div>
+</div>
+</div>
+
+<div class="grid-3 animate" style="margin-bottom:1.5rem">
+<div class="card">
+<div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:0.75rem"><div class="card-icon card-icon-connect" style="margin-bottom:0">A</div><span class="badge badge-green">Audit</span></div>
+<h3 style="font-weight:700;font-size:1rem;margin-bottom:0.5rem">Site-Wide SEO Audit</h3>
+<p style="font-size:0.8125rem;color:var(--neutral-600)">Scan every page for missing meta descriptions, duplicate titles, missing alt text on images, broken OG tags, and inconsistent heading structures. Generate a prioritized fix list.</p>
+<div style="margin-top:0.75rem;font-size:0.75rem;color:var(--neutral-200)">data_pages_tool + element_tool &rarr; audit all pages</div>
+</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:0.75rem"><div class="card-icon card-icon-figma" style="margin-bottom:0">L</div><span class="badge badge-blue">Scale</span></div>
+<h3 style="font-weight:700;font-size:1rem;margin-bottom:0.5rem">Multi-Language Pages</h3>
+<p style="font-size:0.8125rem;color:var(--neutral-600)">Create localized versions across all 5 active locales (EN, DE, ES, FR, IT). Translate content, update page settings per locale, and publish localized versions using the same component structure.</p>
+<div style="margin-top:0.75rem;font-size:0.75rem;color:var(--neutral-200)">data_pages_tool + data_components_tool &rarr; localization</div>
+</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:0.75rem"><div class="card-icon card-icon-webflow" style="margin-bottom:0">C</div><span class="badge badge-blue">Scale</span></div>
+<h3 style="font-weight:700;font-size:1rem;margin-bottom:0.5rem">CMS Content at Scale</h3>
+<p style="font-size:0.8125rem;color:var(--neutral-600)">Bulk create and update CMS items: blog posts, case studies, resource cards, customer stories. Manage collections, fields, and publishing states without touching the Webflow UI.</p>
+<div style="margin-top:0.75rem;font-size:0.75rem;color:var(--neutral-200)">data_cms_tool &rarr; create/update_collection_items</div>
+</div>
+</div>
+
+<div class="grid-3 animate">
+<div class="card">
+<div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:0.75rem"><div class="card-icon card-icon-figma" style="margin-bottom:0">P</div><span class="badge badge-blue">Speed</span></div>
+<h3 style="font-weight:700;font-size:1rem;margin-bottom:0.5rem">Campaign Landing Pages</h3>
+<p style="font-size:0.8125rem;color:var(--neutral-600)">Spin up campaign-specific landing pages using approved Figma templates and existing Webflow components. Same design system, custom copy, production-ready in minutes.</p>
+<div style="margin-top:0.75rem;font-size:0.75rem;color:var(--neutral-200)">Figma MCP + element_builder + style_tool</div>
+</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:0.75rem"><div class="card-icon card-icon-webflow" style="margin-bottom:0">T</div><span class="badge badge-green">Ops</span></div>
+<h3 style="font-weight:700;font-size:1rem;margin-bottom:0.5rem">Script &amp; Tracking Management</h3>
+<p style="font-size:0.8125rem;color:var(--neutral-600)">Deploy, update, or remove tracking pixels, analytics scripts, and structured data across specific pages or site-wide. Manage header vs. footer placement programmatically.</p>
+<div style="margin-top:0.75rem;font-size:0.75rem;color:var(--neutral-200)">data_scripts_tool &rarr; add_inline_site_script</div>
+</div>
+<div class="card">
+<div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:0.75rem"><div class="card-icon card-icon-figma" style="margin-bottom:0">D</div><span class="badge badge-green">Ops</span></div>
+<h3 style="font-weight:700;font-size:1rem;margin-bottom:0.5rem">Design System Enforcement</h3>
+<p style="font-size:0.8125rem;color:var(--neutral-600)">Pull design tokens from Figma (colors, typography, spacing) and verify Webflow styles match. Catch drift between design and production before it reaches visitors.</p>
+<div style="margin-top:0.75rem;font-size:0.75rem;color:var(--neutral-200)">get_variable_defs + style_tool &rarr; compare</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- AI LANDING PAGE BUILDER -->
+<section class="section section-alt" id="ai-builder">
+<div class="container">
+<div class="section-header animate" style="text-align:center">
+<div class="overline">The Vision</div>
+<h2>AI-Powered Landing Page Creation</h2>
+<p style="max-width:700px;margin:0.75rem auto 0">With Figma and Webflow connected through Code Connect, AI can build entire landing pages end-to-end: pull section designs from Figma, generate on-brand copy, and push production-ready pages to Webflow with the correct component structure.</p>
+</div>
+
+<div class="animate" style="margin-bottom:3rem">
+<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:0;align-items:center;text-align:center;margin:3rem 0">
+<div style="padding:1.5rem">
+<div style="width:56px;height:56px;border-radius:50%;background:rgba(153,204,238,0.12);display:flex;align-items:center;justify-content:center;margin:0 auto 0.75rem;font-size:1.25rem;color:var(--domo-blue)">1</div>
+<div style="font-weight:700;font-size:0.875rem;margin-bottom:0.25rem">Pull from Figma</div>
+<div style="font-size:0.75rem;color:var(--neutral-600)">Select a page template or individual sections from Figma</div>
+</div>
+<div style="color:var(--neutral-200);font-size:1.5rem">&rarr;</div>
+<div style="padding:1.5rem">
+<div style="width:56px;height:56px;border-radius:50%;background:rgba(153,204,238,0.12);display:flex;align-items:center;justify-content:center;margin:0 auto 0.75rem;font-size:1.25rem;color:var(--domo-blue)">2</div>
+<div style="font-weight:700;font-size:0.875rem;margin-bottom:0.25rem">Code Connect Resolves</div>
+<div style="font-size:0.75rem;color:var(--neutral-600)">Each Figma component maps to its Webflow counterpart automatically</div>
+</div>
+<div style="color:var(--neutral-200);font-size:1.5rem">&rarr;</div>
+<div style="padding:1.5rem">
+<div style="width:56px;height:56px;border-radius:50%;background:rgba(255,153,34,0.12);display:flex;align-items:center;justify-content:center;margin:0 auto 0.75rem;font-size:1.25rem;color:var(--accent-orange)">3</div>
+<div style="font-weight:700;font-size:0.875rem;margin-bottom:0.25rem">Push to Webflow</div>
+<div style="font-size:0.75rem;color:var(--neutral-600)">Build the page with correct structure, styles, and content in Webflow</div>
+</div>
+</div>
+</div>
+
+<div class="grid-3 animate">
+<div class="card">
+<div style="font-size:1.5rem;margin-bottom:0.75rem">F &rarr;</div>
+<h3 style="font-weight:700;font-size:1rem;margin-bottom:0.5rem">Section Extraction</h3>
+<p style="font-size:0.875rem;color:var(--neutral-600)">Pull any section from a Figma page template: hero, feature grid, FAQ, testimonial, CTA. The design context includes layout, spacing, typography, and imagery references.</p>
+</div>
+<div class="card">
+<div style="font-size:1.5rem;margin-bottom:0.75rem">&#9998;</div>
+<h3 style="font-weight:700;font-size:1rem;margin-bottom:0.5rem">Intelligent Copy</h3>
+<p style="font-size:0.875rem;color:var(--neutral-600)">AI generates on-brand copy for each section. Headlines, body text, CTAs, and FAQ answers are tailored to the product and audience using Domo's messaging framework.</p>
+</div>
+<div class="card">
+<div style="font-size:1.5rem;margin-bottom:0.75rem">&rarr; W</div>
+<h3 style="font-weight:700;font-size:1rem;margin-bottom:0.5rem">Production Assembly</h3>
+<p style="font-size:0.875rem;color:var(--neutral-600)">Each section is assembled in Webflow using existing production components. Hero Section, Anchor Links, Panel List, FAQ Section, Get Started Section, all mapped and structured correctly.</p>
+</div>
+</div>
+
+<div class="animate" style="margin-top:3rem">
+<div class="card" style="border-left:3px solid var(--domo-blue);background:#fff">
+<h3 style="font-weight:700;font-size:1.1rem;margin-bottom:1rem">Example: Building a Pillar Page</h3>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem">
+<div>
+<div style="font-weight:600;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--domo-blue);margin-bottom:0.75rem">Figma Source</div>
+<div style="font-size:0.875rem;color:var(--neutral-600);line-height:1.8">
+<div style="padding:0.4rem 0;border-bottom:1px solid var(--neutral-100)">Pillar Hero Section <span class="badge badge-blue" style="font-size:0.65rem;margin-left:0.5rem">1:599</span></div>
+<div style="padding:0.4rem 0;border-bottom:1px solid var(--neutral-100)">Subnav (anchor links) <span class="badge badge-blue" style="font-size:0.65rem;margin-left:0.5rem">1:671</span></div>
+<div style="padding:0.4rem 0;border-bottom:1px solid var(--neutral-100)">Text Section Title + Image <span class="badge badge-blue" style="font-size:0.65rem;margin-left:0.5rem">1:701</span></div>
+<div style="padding:0.4rem 0;border-bottom:1px solid var(--neutral-100)">Card Grid Icon (connectors) <span class="badge badge-blue" style="font-size:0.65rem;margin-left:0.5rem">connectors</span></div>
+<div style="padding:0.4rem 0;border-bottom:1px solid var(--neutral-100)">Quote Section <span class="badge badge-blue" style="font-size:0.65rem;margin-left:0.5rem">quote</span></div>
+<div style="padding:0.4rem 0;border-bottom:1px solid var(--neutral-100)">FAQ Accordion <span class="badge badge-blue" style="font-size:0.65rem;margin-left:0.5rem">15:2774</span></div>
+<div style="padding:0.4rem 0">Hero Footer Jumbo (CTA) <span class="badge badge-blue" style="font-size:0.65rem;margin-left:0.5rem">1:1095</span></div>
+</div>
+</div>
+<div>
+<div style="font-weight:600;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.05em;color:var(--accent-orange);margin-bottom:0.75rem">Webflow Output</div>
+<div style="font-size:0.875rem;color:var(--neutral-600);line-height:1.8">
+<div style="padding:0.4rem 0;border-bottom:1px solid var(--neutral-100)">Pillar Hero Section <span class="badge badge-green" style="font-size:0.65rem;margin-left:0.5rem">Matched</span></div>
+<div style="padding:0.4rem 0;border-bottom:1px solid var(--neutral-100)">Anchor Links <span class="badge badge-green" style="font-size:0.65rem;margin-left:0.5rem">Matched</span></div>
+<div style="padding:0.4rem 0;border-bottom:1px solid var(--neutral-100)">Header Section + Panel List <span class="badge badge-green" style="font-size:0.65rem;margin-left:0.5rem">Matched</span></div>
+<div style="padding:0.4rem 0;border-bottom:1px solid var(--neutral-100)">Card Grid Icon <span class="badge badge-green" style="font-size:0.65rem;margin-left:0.5rem">Matched</span></div>
+<div style="padding:0.4rem 0;border-bottom:1px solid var(--neutral-100)">Quote Section <span class="badge badge-green" style="font-size:0.65rem;margin-left:0.5rem">Matched</span></div>
+<div style="padding:0.4rem 0;border-bottom:1px solid var(--neutral-100)">CMS FAQ Section <span class="badge badge-green" style="font-size:0.65rem;margin-left:0.5rem">Matched</span></div>
+<div style="padding:0.4rem 0">Get Started Section <span class="badge badge-green" style="font-size:0.65rem;margin-left:0.5rem">Matched</span></div>
+</div>
+</div>
+</div>
+<div style="margin-top:1.25rem;padding:1rem;background:var(--neutral-50);border-radius:var(--radius-md);font-size:0.875rem;color:var(--neutral-600)">
+<strong style="color:var(--neutral-900)">Result:</strong> A complete pillar page with 7 sections, on-brand copy, correct component structure, and production-ready Webflow code. Built in minutes, not days. Every section uses existing production components with no manual assembly required.
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- SETUP -->
+<section class="section" id="setup">
+<div class="container">
+<div class="section-header animate">
+<div class="overline">Getting Started</div>
+<h2>Setup Guide</h2>
+</div>
+<div class="animate">
+<div class="accordion-item open">
+<div class="accordion-header">Step 1: Connect Figma MCP <span class="accordion-chevron">&#9660;</span></div>
+<div class="accordion-body">
+<p style="margin-bottom:0.75rem;color:var(--neutral-600)">Run this command to add the official Figma MCP server via Claude Code's native HTTP transport:</p>
+<div class="code-block"><button class="code-copy" onclick="copyCode(this)">Copy</button><code>claude mcp add --transport http figma https://mcp.figma.com/mcp</code></div>
+<p style="color:var(--neutral-600);font-size:0.875rem;margin-top:0.75rem">A browser window will open for OAuth authentication. Approve access with your Figma Enterprise account. The connection persists across sessions.</p>
+</div>
+</div>
+<div class="accordion-item">
+<div class="accordion-header">Step 2: Connect Webflow MCP <span class="accordion-chevron">&#9660;</span></div>
+<div class="accordion-body">
+<p style="margin-bottom:0.75rem;color:var(--neutral-600)">The Webflow MCP connects via a workspace API token configured in Claude Code's settings:</p>
+<div class="code-block"><button class="code-copy" onclick="copyCode(this)">Copy</button><code><span class="str">"webflow"</span>: {
+  <span class="str">"command"</span>: <span class="str">"npx"</span>,
+  <span class="str">"args"</span>: [<span class="str">"-y"</span>, <span class="str">"webflow-mcp-server"</span>],
+  <span class="str">"env"</span>: {
+    <span class="str">"WEBFLOW_TOKEN"</span>: <span class="str">"your-webflow-api-token"</span>
+  }
+}</code></div>
+<p style="color:var(--neutral-600);font-size:0.875rem;margin-top:0.75rem">For Designer tools, open the Webflow Designer in your browser and ensure the MCP app is running.</p>
+</div>
+</div>
+<div class="accordion-item">
+<div class="accordion-header">Step 3: Create Code Connect Mappings <span class="accordion-chevron">&#9660;</span></div>
+<div class="accordion-body">
+<p style="margin-bottom:0.75rem;color:var(--neutral-600)">Share a Figma file URL with Claude Code. It will analyze the components, scan the Webflow site, and suggest 1:1 mappings between design and production components.</p>
+<div class="code-block"><button class="code-copy" onclick="copyCode(this)">Copy</button><code><span class="cmt">// Example: Map Figma Button to Webflow Button Link</span>
+{
+  <span class="str">"nodeId"</span>: <span class="str">"1:243"</span>,
+  <span class="str">"componentName"</span>: <span class="str">"Button/Primary"</span>,
+  <span class="str">"source"</span>: <span class="str">"webflow://Button Link"</span>,
+  <span class="str">"label"</span>: <span class="str">"Web Components"</span>
+}</code></div>
+</div>
+</div>
+<div class="accordion-item">
+<div class="accordion-header">Step 4: Verify Connections <span class="accordion-chevron">&#9660;</span></div>
+<div class="accordion-body">
+<p style="color:var(--neutral-600)">Type <code>/mcp</code> in Claude Code to see all connected servers. Both Figma and Webflow should show as active (green). The Figma server authenticates via OAuth; the Webflow server connects via API token.</p>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+<div class="container">
+<div class="footer-inner">
+<div style="display:flex;align-items:center;gap:0.75rem">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="32" height="32"><path fill="#fff" d="M150.5,328.6c12.4,13.8,21.2,30.9,25,49.8,9.9-48.8,53-85.5,104.7-85.5s94.8,36.8,104.7,85.6v-85.6l106.8,106.8,107.1-106.8v85.6c9.9-48.8,53-85.6,104.7-85.6s79.2,24.8,96.4,60.7V0H0v292.9h70.8c31.7,0,60.1,13.8,79.7,35.7Z"/><path fill="#fff" d="M703.6,506.6c-51.7,0-94.8-36.8-104.7-85.6v85.6h-36v-127.8l-71.1,71.4-71.4-71.4v127.8h-35.4v-85.6c-9.9,48.8-53,85.6-104.7,85.6s-94.8-36.7-104.7-85.5c-3.8,18.9-12.6,36-25,49.8-19.6,21.9-48,35.7-79.7,35.7H0v293.4h800v-354.2c-17.2,35.9-53.9,60.7-96.4,60.7h0Z"/><path fill="#fff" d="M280.2,471c39.4,0,71.3-31.9,71.3-71.3s-31.9-71.3-71.3-71.3-71.3,31.9-71.3,71.3,31.9,71.3,71.3,71.3Z"/><path fill="#fff" d="M142.1,399.7c0-37.8-29.4-68.7-66.6-71.1h-40.1v142.2h40.1c37.2-2.4,66.6-33.3,66.6-71.1h0Z"/><path fill="#fff" d="M703.6,471c39.4,0,71.3-31.9,71.3-71.3s-31.9-71.3-71.3-71.3-71.3,31.9-71.3,71.3,31.9,71.3,71.3,71.3Z"/><path fill="#99CCEE" d="M150.5,470.8c12.4-13.8,21.2-30.9,25-49.8,9.9,48.8,53,85.5,104.7,85.5s94.8-36.8,104.7-85.6v85.6h35.4v-127.8l71.4,71.4,71.1-71.4v127.8h36v-85.6c9.9,48.8,53,85.6,104.7,85.6s79.2-24.8,96.4-60.7v-92.2c-17.2-35.9-53.9-60.7-96.4-60.7s-94.8,36.8-104.7,85.6v-85.6l-107.1,106.8-106.8-106.8v85.6c-9.9-48.8-53-85.6-104.7-85.6s-94.8,36.7-104.7,85.5c-3.8-18.9-12.6-36-25-49.8-19.6-21.9-48-35.7-79.7-35.7H0v213.7h70.8c31.7,0,60.1-13.8,79.7-35.7h0ZM703.6,328.5c39.4,0,71.3,31.9,71.3,71.3s-31.9,71.3-71.3,71.3-71.3-31.9-71.3-71.3,31.9-71.3,71.3-71.3ZM280.2,328.5c39.4,0,71.3,31.9,71.3,71.3s-31.9,71.3-71.3,71.3-71.3-31.9-71.3-71.3,31.9-71.3,71.3-71.3ZM35.4,328.6h40.1c37.2,2.4,66.6,33.3,66.6,71.1s-29.4,68.7-66.6,71.1h-40.1v-142.2h0Z"/></svg>
+<span style="font-size:0.875rem">Built by Domo Marketing &amp; Growth</span>
+</div>
+<div class="footer-links">
+<span style="font-size:0.8rem;color:var(--neutral-600)">February 2026</span>
+</div>
+</div>
+</div>
+</footer>
+
+<script>
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a=>{a.addEventListener('click',e=>{e.preventDefault();const t=document.querySelector(a.getAttribute('href'));if(t)t.scrollIntoView({behavior:'smooth',block:'start'});})});
+
+// Scroll animations
+const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');obs.unobserve(e.target)}})},{threshold:0.1});
+document.querySelectorAll('.animate').forEach(el=>obs.observe(el));
+
+// Number counters
+function animateValue(el,start,end,duration){const st=performance.now();function update(ct){const p=Math.min((ct-st)/duration,1);const ease=1-Math.pow(2,-10*p);el.textContent=Math.floor(start+(end-start)*ease).toLocaleString();if(p<1)requestAnimationFrame(update)}requestAnimationFrame(update)}
+const statObs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){const v=parseInt(e.target.dataset.value);animateValue(e.target,0,v,1500);statObs.unobserve(e.target)}})},{threshold:0.5});
+document.querySelectorAll('[data-value]').forEach(el=>statObs.observe(el));
+
+// Tabs
+document.querySelectorAll('.tab').forEach(tab=>{tab.addEventListener('click',()=>{const g=tab.parentElement;g.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));tab.classList.add('active');const s=tab.closest('.container')||tab.closest('section');s.querySelectorAll('.tab-content').forEach(c=>c.classList.remove('active'));const target=s.querySelector('#tab-'+tab.dataset.tab);if(target)target.classList.add('active')})});
+
+// Accordion
+document.querySelectorAll('.accordion-header').forEach(h=>{h.addEventListener('click',()=>{h.parentElement.classList.toggle('open')})});
+
+// Copy
+function copyCode(btn){const code=btn.parentElement.querySelector('code');navigator.clipboard.writeText(code.textContent).then(()=>{btn.textContent='Copied!';setTimeout(()=>btn.textContent='Copy',2000)})}
+</script>
+</body>
+</html>
